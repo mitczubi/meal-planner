@@ -1,3 +1,5 @@
 /server/_data
 /server/config
 /server/node_modules
+
+/client/node_modules
