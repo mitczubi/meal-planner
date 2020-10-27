@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 
 const connectDB = require('./config/db');
+const errorHandler = require('./middleware/error');
 
 // Load env vars
 dotenv.config({
@@ -15,6 +16,7 @@ connectDB();
 
 // Route Files
 const meals = require('./routes/meals');
+const auth = require('./routes/auth');
 
 const app = express();
 
@@ -32,7 +34,10 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Mount routers
-app.use('/api/v1/meals', meals)
+app.use('/api/v1/meals', meals);
+app.use('/api/v1/auth', auth);
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 8081;
 

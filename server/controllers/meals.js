@@ -1,9 +1,11 @@
+const ErrorResponse = require('../utils/errorResponse');
 const Meal = require('../models/Meal');
+const asyncHandler = require('../middleware/async');
 
 // @desc   Get all meals
 // @route  GET /api/v1/meals
 // @access Public
-exports.getAllMeals = async (req, res, next) => {
+exports.getAllMeals = asyncHandler(async (req, res, next) => {
   try {
     const meals = await Meal.find();
 
@@ -16,30 +18,30 @@ exports.getAllMeals = async (req, res, next) => {
       success: false
     });
   }
-};
+});
 
 // @desc   Get single meal
 // @route  GET /api/v1/meals/:id
 // @access Public
-exports.getMeal = async (req, res, next) => {
-  try {
-    const meal = await Meal.findById(req.params.id);
+exports.getMeal = asyncHandler(async (req, res, next) => {
+  const meal = await Meal.findById(req.params.id);
 
-    res.status(200).json({
-      success: true,
-      data: meal
-    })
-  } catch (err) {
-    res.status(400).json({
-      success: false
-    });
+  if (!meal) {
+    return next(
+      new ErrorResponse(`Meal not found with id or ${req.params.id}`, 404)
+    )
   }
-};
+
+  res.status(200).json({
+    success: true,
+    data: meal
+  });
+});
 
 // @desc   Get single random meal
 // @route  GET /api/v1/meals/random
 // @access Public
-exports.getRandomMeal = async (req, res, next) => {
+exports.getRandomMeal = asyncHandler(async (req, res, next) => {
   try {
     const count = await Meal.count();
     let random = Math.floor(Math.random() * count);
@@ -56,24 +58,24 @@ exports.getRandomMeal = async (req, res, next) => {
       success: false
     });
   }
-};
+});
 
 // @desc   Create new meals
 // @route  POST /api/v1/meals
 // @access Public
-exports.createMeal = async (req, res, next) => {
+exports.createMeal = asyncHandler(async (req, res, next) => {
   const meal = await Meal.create(req.body);
 
   res.status(201).json({
     success: true,
     data: meal
   });
-};
+});
 
 // @desc   Update meal
 // @route  PUT /api/v1/meals/:id
 // @access Public
-exports.updateMeal = async (req, res, next) => {
+exports.updateMeal = asyncHandler(async (req, res, next) => {
   const meal = await Meal.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true
@@ -89,12 +91,12 @@ exports.updateMeal = async (req, res, next) => {
     success: true,
     data: meal
   });
-};
+});
 
 // @desc   Delete meal
 // @route  DELETE /api/v1/meals/:id
 // @access Public
-exports.deleteMeal = async (req, res, next) => {
+exports.deleteMeal = asyncHandler(async (req, res, next) => {
   try {
     const meal = await Meal.findByIdAndDelete(req.params.id);
 
@@ -113,4 +115,4 @@ exports.deleteMeal = async (req, res, next) => {
       success: false
     });
   }
-};
+});
